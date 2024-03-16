@@ -8,11 +8,11 @@
 import Foundation
 import HttpClient
 
-public protocol JsonRpcServiceImplementation: JsonRpcService, ApplicationLayer, ApplicationLayerWithoutReturnValue {
+public protocol JsonRpcClientImplementation: JsonRpcClient, ApplicationLayer, ApplicationLayerWithoutReturnValue {
     var endpoint: Path { get }
 }
 
-public extension JsonRpcServiceImplementation {
+public extension JsonRpcClientImplementation {
     func invoke<E: Encodable, D: Decodable>(method: String, params: E) async throws -> D {
         try await post(endpoint, parameters: JsonRpcRequest(method: method, params: params, id: .null))
     }
@@ -26,6 +26,6 @@ public extension JsonRpcServiceImplementation {
     }
 }
 
-public extension JsonRpcServiceImplementation where Self: HttpClientWithBaseURL, Path: ExpressibleByStringLiteral {
+public extension JsonRpcClientImplementation where Self: HttpClientWithBaseURL, Path: ExpressibleByStringLiteral {
     var endpoint: Path { "/" }
 }

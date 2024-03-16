@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol JsonRpcService {
+public protocol JsonRpcClient {
 
     func invoke<E: Encodable, D: Decodable>(method: String, params: E) async throws -> D
     func notify<E: Encodable>(method: String, params: E) async throws

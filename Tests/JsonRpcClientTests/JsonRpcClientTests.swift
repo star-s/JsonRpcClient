@@ -1,7 +1,7 @@
 import XCTest
-@testable import JsonRpcService
+@testable import JsonRpcClient
 
-final class JsonRpcServiceTests: XCTestCase {
+final class JsonRpcClientTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest
