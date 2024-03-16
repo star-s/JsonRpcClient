@@ -1,6 +1,7 @@
-# JsonRpcService
+# JsonRpcClient
 
-Library for accessing to Json Rpc Service.
+Library for accessing to [JSON-RPC](https://www.jsonrpc.org) Service.
+
 Example of using [HttpClient](https://github.com/star-s/HttpClient.git)
 
 ## Installation
@@ -15,7 +16,7 @@ import PackageDescription
 let package = Package(
     name: "MyApp",
     dependencies: [
-        .package(url: "https://github.com/star-s/JsonRpcService.git", from: "0.1")
+        .package(url: "https://github.com/star-s/JsonRpcClient.git", from: "0.1")
     ]
 )
 ```

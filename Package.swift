@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "JsonRpcService",
+    name: "JsonRpcClient",
     platforms: [
         .macOS(.v10_15),
         .iOS(.v13),
@@ -14,8 +14,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "JsonRpcService",
-            targets: ["JsonRpcService"]),
+            name: "JsonRpcClient",
+            targets: ["JsonRpcClient"]),
     ],
     dependencies: [
         .package(url: "https://github.com/star-s/HttpClient.git", from: "0.3.0"),
@@ -24,10 +24,10 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "JsonRpcService",
+            name: "JsonRpcClient",
             dependencies: ["HttpClient"]),
         .testTarget(
-            name: "JsonRpcServiceTests",
-            dependencies: ["JsonRpcService"]),
+            name: "JsonRpcClientTests",
+            dependencies: ["JsonRpcClient"]),
     ]
 )
