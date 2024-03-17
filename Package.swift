@@ -28,6 +28,6 @@ let package = Package(
             dependencies: ["HttpClient"]),
         .testTarget(
             name: "JsonRpcClientTests",
-            dependencies: ["JsonRpcClient"]),
+            dependencies: ["JsonRpcClient", "HttpClient"]),
     ]
 )
