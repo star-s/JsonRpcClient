@@ -16,9 +16,12 @@ let package = Package(
         .library(
             name: "JsonRpcClient",
             targets: ["JsonRpcClient"]),
+        .library(
+            name: "JsonRpcClientMocks",
+            targets: ["JsonRpcClientMocks"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/star-s/HttpClient.git", from: "0.3.0"),
+        .package(url: "https://github.com/star-s/HttpClient.git", from: "0.3.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -26,8 +29,15 @@ let package = Package(
         .target(
             name: "JsonRpcClient",
             dependencies: ["HttpClient"]),
+        .target(
+            name: "JsonRpcClientMocks",
+            dependencies: [
+                "JsonRpcClient",
+                .product(name: "HttpClientMocks", package: "HttpClient"),
+                .product(name: "HttpClientUtilities", package: "HttpClient"),
+            ]),
         .testTarget(
             name: "JsonRpcClientTests",
-            dependencies: ["JsonRpcClient", "HttpClient"]),
+            dependencies: ["JsonRpcClient", "JsonRpcClientMocks", "HttpClient"]),
     ]
 )
