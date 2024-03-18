@@ -14,17 +14,25 @@ public struct JsonRpcRequest {
 
 	private let paramsEncoder: (inout KeyedEncodingContainer<CodingKeys>) throws -> Void
 
-	public init<T: Encodable>(
+    private init<T: Encodable>(
         version: JsonRpcVersion = .v2_0,
         method: String,
         params: T,
-        id: JsonRpcId? = nil
+        id: JsonRpcId?
     ) {
-		self.jsonrpc = version
-		self.method = method
-		self.paramsEncoder = { try $0.encode(params, forKey: .params) }
-		self.id = id
-	}
+        self.jsonrpc = version
+        self.method = method
+        self.paramsEncoder = { try $0.encode(params, forKey: .params) }
+        self.id = id
+    }
+
+    public static func notification<T: Encodable>(method: String, params: T) -> JsonRpcRequest {
+        JsonRpcRequest(version: .v2_0, method: method, params: params, id: nil)
+    }
+
+    public static func invocation<T: Encodable>(method: String, params: T, id: JsonRpcId) -> JsonRpcRequest {
+        JsonRpcRequest(version: .v2_0, method: method, params: params, id: id)
+    }
 }
 
 extension JsonRpcRequest: Encodable {

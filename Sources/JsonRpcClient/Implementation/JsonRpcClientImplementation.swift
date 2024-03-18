@@ -14,11 +14,11 @@ public protocol JsonRpcClientImplementation: JsonRpcClient, ApplicationLayer, Ap
 
 public extension JsonRpcClientImplementation {
     func invoke<E: Encodable, D: Decodable>(method: String, params: E) async throws -> D {
-        try await post(endpoint, parameters: JsonRpcRequest(method: method, params: params, id: .null))
+        try await post(endpoint, parameters: JsonRpcRequest.invocation(method: method, params: params, id: .null))
     }
 
     func notify<E: Encodable>(method: String, params: E) async throws {
-        try await post(endpoint, parameters: JsonRpcRequest(method: method, params: params))
+        try await post(endpoint, parameters: JsonRpcRequest.notification(method: method, params: params))
     }
 
     func performBatch(requests: [JsonRpcRequest]) async throws -> [JsonRpcResponse<AnyDecodable>] {

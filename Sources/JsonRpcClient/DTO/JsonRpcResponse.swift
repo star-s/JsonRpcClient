@@ -13,9 +13,9 @@ public struct JsonRpcResponse<T> {
 	public let id: JsonRpcId
 
 	public init(
-        jsonrpc: JsonRpcVersion = .v2_0,
+        jsonrpc: JsonRpcVersion,
         result: Result<T, JsonRpcError>,
-        id: JsonRpcId = nil
+        id: JsonRpcId
     ) {
 		self.jsonrpc = jsonrpc
         self.result = result
