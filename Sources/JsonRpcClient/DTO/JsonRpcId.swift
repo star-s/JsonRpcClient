@@ -29,6 +29,8 @@ public extension JsonRpcId {
 	}
 }
 
+extension JsonRpcId: Hashable {}
+
 extension JsonRpcId: Encodable {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
@@ -75,11 +77,5 @@ extension JsonRpcId: ExpressibleByStringLiteral {
 extension JsonRpcId: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: Int) {
 		self = .number(value)
-	}
-}
-
-extension JsonRpcId: ExpressibleByNilLiteral {
-	public init(nilLiteral: ()) {
-		self = .null
 	}
 }
