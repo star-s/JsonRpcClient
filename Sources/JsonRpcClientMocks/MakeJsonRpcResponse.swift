@@ -14,11 +14,16 @@ public func makeJsonRpcResponse(
     for request: URLRequest,
     decoder: JSONDecoder = JSONDecoder(),
     encoder: JSONEncoder = JSONEncoder(),
-    _ closure: (JsonRpcResponseBuilder) -> Void
+    _ closure: (JsonRpc.Response.Builder) -> Void
 ) throws -> (data: Data, response: URLResponse) {
-    try handleURLRequest(request) {
-        let builder = try JsonRpcResponseBuilder(id: request.jsonRpcRequest(decoder: decoder).id)
-        closure(builder)
+    guard case .single(let rpcRequesr) = try request.decodeJsonRpcRequest(decoder: decoder) else {
+        return try handleURLRequest(request) {
+            try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32700, message: "Parse error"), encoder: encoder)
+        }
+    }
+    let builder = JsonRpc.Response.Builder(id: rpcRequesr.id)
+    closure(builder)
+    return try handleURLRequest(request) {
         guard let response = builder.response else {
             return Data().tag(as: kUTTypeJSON)
         }
