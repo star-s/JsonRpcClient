@@ -11,14 +11,14 @@ public struct JsonRpcServiceMock: JsonRpcService {
     public let decoder: JSONDecoder
     public let encoder: JSONEncoder
 
-    private let implementations: [String: ((JsonRpc.Request, JsonRpc.Response.Builder) async throws -> Void)]
-    private let notifications: [String: ((JsonRpc.Request) async throws -> Void)]
+    private let implementations: [String: ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)]
+    private let notifications: [String: ((JsonRpc.Request) async -> Void)]
 
     public init(
         decoder: JSONDecoder = JSONDecoder(),
         encoder: JSONEncoder = JSONEncoder(),
-        implementations: [String : ((JsonRpc.Request, JsonRpc.Response.Builder) async throws -> Void)],
-        notifications: [String : ((JsonRpc.Request) async throws -> Void)] = [:]
+        implementations: [String : ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)],
+        notifications: [String : ((JsonRpc.Request) async -> Void)] = [:]
     ) {
         self.decoder = decoder
         self.encoder = encoder
@@ -26,11 +26,11 @@ public struct JsonRpcServiceMock: JsonRpcService {
         self.notifications = notifications
     }
 
-    public func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async throws -> Void)? {
+    public func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)? {
         implementations[method]
     }
 
-    public func notificationHandler(_ name: String) -> ((JsonRpc.Request) async throws -> Void)? {
+    public func notificationHandler(_ name: String) -> ((JsonRpc.Request) async -> Void)? {
         notifications[name]
     }
 }

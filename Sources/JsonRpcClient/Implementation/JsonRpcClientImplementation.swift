@@ -14,7 +14,7 @@ public protocol JsonRpcClientImplementation: JsonRpcClient, ApplicationLayer, Ap
 
 public extension JsonRpcClientImplementation {
     func invoke<E: Encodable, D: Decodable>(method: String, params: E) async throws -> D {
-        try await post(endpoint, parameters: JsonRpcRequest.invocation(method: method, params: params, id: .null))
+        try await post(endpoint, parameters: JsonRpcRequest.invocation(method: method, params: params, id: .string(UUID().uuidString)))
     }
 
     func notify<E: Encodable>(method: String, params: E) async throws {

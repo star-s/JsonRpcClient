@@ -13,8 +13,8 @@ public protocol JsonRpcService: TransportLayer {
     var decoder: JSONDecoder { get }
     var encoder: JSONEncoder { get }
 
-    func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async throws -> Void)?
-    func notificationHandler(_ name: String) -> ((JsonRpc.Request) async throws -> Void)?
+    func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)?
+    func notificationHandler(_ name: String) -> ((JsonRpc.Request) async -> Void)?
 }
 
 extension JsonRpcService {
@@ -38,14 +38,14 @@ extension JsonRpcService {
     private func handleJsonRpc(request kind: JsonRpc.Request.Kind) async throws -> TaggedData {
         switch kind {
         case .single(let request):
-            guard let response = try await handle(request: request) else {
+            guard let response = await handle(request: request) else {
                 return Data().tag(as: kUTTypeJSON)
             }
             return try TaggedData.jsonEncoded(response, encoder: encoder)
         case .batch(let requests):
             var responses: [JsonRpc.Response] = []
             for request in requests {
-                guard let response = try await handle(request: request) else {
+                guard let response = await handle(request: request) else {
                     continue
                 }
                 responses.append(response)
@@ -54,10 +54,9 @@ extension JsonRpcService {
         }
     }
 
-    private func handle(request: JsonRpc.Request) async throws -> JsonRpc.Response? {
+    private func handle(request: JsonRpc.Request) async -> JsonRpc.Response? {
         guard request.isInvocation else {
-            try await notificationHandler(request.method)?(request)
-            // ???: handle notificationHandler == nil
+            await notificationHandler(request.method)?(request)
             return nil
         }
         let builder = JsonRpc.Response.Builder(id: request.id)
@@ -66,7 +65,7 @@ extension JsonRpcService {
             builder.return(error: -32601, message: "Method not found")
             return builder.response
         }
-        try await methodImplementation(request, builder)
+        await methodImplementation(request, builder)
         if builder.response == nil {
             builder.returnNull()
         }
