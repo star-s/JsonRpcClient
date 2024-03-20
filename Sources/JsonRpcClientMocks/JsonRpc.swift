@@ -42,6 +42,18 @@ public enum JsonRpc {
 
 extension JsonRpc.Request: Decodable {
 
+    public struct Box: Decodable {
+        private let container: KeyedDecodingContainer<DecodingKeys>
+
+        public init(from decoder: any Decoder) throws {
+            container = try decoder.container(keyedBy: DecodingKeys.self)
+        }
+
+        public func unbox() throws -> JsonRpc.Request {
+            try JsonRpc.Request(container: container)
+        }
+    }
+
     private enum DecodingKeys: String, CodingKey {
         case jsonrpc
         case id
@@ -50,7 +62,10 @@ extension JsonRpc.Request: Decodable {
     }
 
     public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: DecodingKeys.self)
+        try self.init(container: decoder.container(keyedBy: DecodingKeys.self))
+    }
+
+    private init(container: KeyedDecodingContainer<DecodingKeys>) throws {
         self.jsonrpc = try container.decode(JsonRpcVersion.self, forKey: .jsonrpc)
         self.id = try container.contains(.id) ? container.decode(JsonRpcId.self, forKey: .id) : nil
         self.method = try container.decode(String.self, forKey: .method)

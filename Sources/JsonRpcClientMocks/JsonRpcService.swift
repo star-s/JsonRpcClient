@@ -40,15 +40,15 @@ extension JsonRpcService {
             }
             return try TaggedData.jsonEncoded(response, encoder: encoder)
         }
-        guard let batchRequest = try? decoder.decode([AnyDecodable].self, from: data) else {
+        guard let batchRequest = try? decoder.decode([JsonRpc.Request.Box].self, from: data) else {
             return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32700, message: "Parse error"))
         }
         if batchRequest.isEmpty {
             return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
         }
         var responses: [JsonRpc.Response] = []
-        for obj in batchRequest {
-            guard let request = try? obj.value(JsonRpc.Request.self) else {
+        for item in batchRequest {
+            guard let request = try? item.unbox() else {
                 responses.append(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
                 continue
             }
