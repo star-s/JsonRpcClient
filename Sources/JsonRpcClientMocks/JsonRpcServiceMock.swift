@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import HttpClient
 
-public struct JsonRpcServiceMock: JsonRpcService {
+public struct JsonRpcServiceMock: TransportLayer, JsonRpcService {
     public let decoder: JSONDecoder
     public let encoder: JSONEncoder
 
@@ -25,6 +26,14 @@ public struct JsonRpcServiceMock: JsonRpcService {
         self.implementations = implementations
         self.notifications = notifications
     }
+
+    // MARK: - TransportLayer
+
+    public func perform(_ request: URLRequest) async throws -> (data: Data, response: URLResponse) {
+        await handle(request: request)
+    }
+
+    // MARK: - JsonRpcService
 
     public func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)? {
         implementations[method]

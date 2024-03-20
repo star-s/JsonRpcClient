@@ -21,7 +21,7 @@ let package = Package(
             targets: ["JsonRpcClientMocks"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/star-s/HttpClient.git", from: "0.3.1"),
+        .package(url: "https://github.com/star-s/HttpClient.git", from: "0.3.2"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

@@ -6,55 +6,61 @@
 //
 
 import Foundation
-import CoreServices
+import HttpClientUtilities
 import HttpClientMocks
+import JsonRpcClient
 
-public protocol JsonRpcService: TransportLayer {
+public protocol JsonRpcService {
     var decoder: JSONDecoder { get }
     var encoder: JSONEncoder { get }
+
+    func handle(request: URLRequest) async -> (data: Data, response: URLResponse)
 
     func implementation(for method: String) -> ((JsonRpc.Request, JsonRpc.Response.Builder) async -> Void)?
     func notificationHandler(_ name: String) -> ((JsonRpc.Request) async -> Void)?
 }
 
 extension JsonRpcService {
-    public func perform(_ request: URLRequest) async throws -> (data: Data, response: URLResponse) {
-        guard let requestKind = try? request.decodeJsonRpcRequest(decoder: decoder) else {
-            return try handleURLRequest(request) {
-                try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32700, message: "Parse error"))
-            }
+    public func handle(request: URLRequest) async -> (data: Data, response: URLResponse) {
+        guard let httpBody = request.httpBody else {
+            return httpResponse(for: request, statusCode: .badRequest)
         }
         do {
-            let data = try await handleJsonRpc(request: requestKind)
-            return try handleURLRequest(request) { data }
+            let data = try await handleJsonRpc(data: httpBody)
+            return httpResponse(for: request, data: data)
         } catch {
-            return try handleURLRequest(request) {
-                // ???: HTTP error 5xx?
-                try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32603, message: "Internal error"))
-            }
+            return httpResponse(for: request, statusCode: .internalServerError)
         }
     }
 
-    private func handleJsonRpc(request kind: JsonRpc.Request.Kind) async throws -> TaggedData {
-        switch kind {
-        case .single(let request):
+    private func handleJsonRpc(data: Data) async throws -> TaggedData {
+        if let request = try? decoder.decode(JsonRpc.Request.self, from: data) {
             guard let response = await handle(request: request) else {
-                return Data().tag(as: kUTTypeJSON)
+                return Data().tagged(with: [])
             }
             return try TaggedData.jsonEncoded(response, encoder: encoder)
-        case .batch(let requests):
-            if requests.isEmpty {
-                return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
-            }
-            var responses: [JsonRpc.Response] = []
-            for request in requests {
-                guard let response = await handle(request: request) else {
-                    continue
-                }
-                responses.append(response)
-            }
-            return try TaggedData.jsonEncoded(responses, encoder: encoder)
         }
+        guard let batchRequest = try? decoder.decode([AnyDecodable].self, from: data) else {
+            return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32700, message: "Parse error"))
+        }
+        if batchRequest.isEmpty {
+            return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
+        }
+        var responses: [JsonRpc.Response] = []
+        for obj in batchRequest {
+            guard let request = try? obj.value(JsonRpc.Request.self) else {
+                responses.append(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
+                continue
+            }
+            guard let response = await handle(request: request) else {
+                continue
+            }
+            responses.append(response)
+        }
+        if responses.isEmpty {
+            return Data().tagged(with: [])
+        }
+        return try TaggedData.jsonEncoded(responses, encoder: encoder)
     }
 
     private func handle(request: JsonRpc.Request) async -> JsonRpc.Response? {
