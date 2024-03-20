@@ -78,20 +78,17 @@ final class RpcCallTests: XCTestCase {
         ])
         XCTAssertFalse(responses.isEmpty)
 
-        let sumResult = try responses.first(where: { $0.id == 1 })?.result.get().value(Int.self)
+        let sumResult = try responses.item(id: 1)?.result(Int.self)
         XCTAssertEqual(sumResult, 7)
 
-        let subtractResult = try responses.first(where: { $0.id == 2 })?.result.get().value(Int.self)
+        let subtractResult = try responses.item(id: 2)?.result(Int.self)
         XCTAssertEqual(subtractResult, 19)
 
-        do {
-            _ = try responses.first(where: { $0.id == 5 })?.result.get()
-        } catch let error as JsonRpcError {
-            XCTAssertEqual(error.code, -32601)
-            XCTAssertEqual(error.message, "Method not found")
-        }
+        let error = try XCTUnwrap(responses.item(id: 5)?.error())
+        XCTAssertEqual(error.code, -32601)
+        XCTAssertEqual(error.message, "Method not found")
 
-        let getGataResult = try XCTUnwrap(responses.first(where: { $0.id == 9 })?.result.get().value([String].self))
+        let getGataResult = try XCTUnwrap(responses.item(id: 9)?.result([String].self))
         XCTAssertEqual(getGataResult.count, 2)
         XCTAssertTrue(getGataResult.contains("hello"))
         XCTAssertTrue(getGataResult.contains("5"))

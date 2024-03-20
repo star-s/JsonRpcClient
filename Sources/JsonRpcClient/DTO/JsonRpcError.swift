@@ -12,29 +12,29 @@ public struct JsonRpcError {
 	public let message: String
 
     public var hasData: Bool {
-        dataContainer.contains(.data)
+        container.contains(.data)
     }
 
-	private let dataContainer: KeyedDecodingContainer<CodingKeys>
+	private let container: KeyedDecodingContainer<CodingKeys>
 
     public init(code: Int, message: String) {
         self.code = code
         self.message = message
-        self.dataContainer = KeyedDecodingContainer(EmptyKeyedContainer())
+        self.container = KeyedDecodingContainer(EmptyKeyedContainer())
     }
 
     public init<T: Decodable>(code: Int, message: String, data: T?) {
         self.code = code
         self.message = message
         if let data {
-            self.dataContainer = KeyedDecodingContainer(SingleValueContainer(key: .data, value: data))
+            self.container = KeyedDecodingContainer(SingleValueContainer(key: .data, value: data))
         } else {
-            self.dataContainer = KeyedDecodingContainer(EmptyKeyedContainer())
+            self.container = KeyedDecodingContainer(EmptyKeyedContainer())
         }
     }
 
 	public func data<T: Decodable>(_ type: T.Type = T.self) throws -> T {
-		try dataContainer.decode(type, forKey: .data)
+		try container.decode(type, forKey: .data)
 	}
 }
 
@@ -51,7 +51,7 @@ extension JsonRpcError: Decodable {
 
 		self.code = try container.decode(Int.self, forKey: .code)
 		self.message = try container.decode(String.self, forKey: .message)
-		self.dataContainer = container
+		self.container = container
 	}
 }
 
