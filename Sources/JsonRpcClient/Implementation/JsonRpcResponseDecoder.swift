@@ -28,9 +28,20 @@ public struct JsonRpcResponseDecoder: ResponseDecoder {
     }
 
     public func decode<T: Decodable>(response: (data: Data, response: URLResponse)) async throws -> T {
-        if T.self is [JsonRpcResponse<AnyDecodable>].Type {
-            return try decoder.decode(T.self, from: response.data)
+        guard T.self is [JsonRpcResponse<AnyDecodable>].Type else {
+            return try decoder.decode(JsonRpcResponse<T>.self, from: response.data).result.get()
         }
-        return try decoder.decode(JsonRpcResponse<T>.self, from: response.data).result.get()
+        if response.data.isEmpty {
+            return [] as! T
+        }
+        if let result = try? decoder.decode(JsonRpcResponse<AnyDecodable>.self, from: response.data).result {
+            switch result {
+            case .failure(let error):
+                throw error
+            case .success:
+                throw URLError(.badServerResponse)
+            }
+        }
+        return try decoder.decode(T.self, from: response.data)
     }
 }

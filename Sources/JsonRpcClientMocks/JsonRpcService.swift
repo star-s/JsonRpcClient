@@ -43,6 +43,9 @@ extension JsonRpcService {
             }
             return try TaggedData.jsonEncoded(response, encoder: encoder)
         case .batch(let requests):
+            if requests.isEmpty {
+                return try TaggedData.jsonEncoded(JsonRpc.Response.error(error: -32600, message: "Invalid Request"))
+            }
             var responses: [JsonRpc.Response] = []
             for request in requests {
                 guard let response = await handle(request: request) else {
