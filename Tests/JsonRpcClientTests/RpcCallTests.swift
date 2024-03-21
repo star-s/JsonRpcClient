@@ -61,7 +61,7 @@ final class RpcCallTests: XCTestCase {
 
     func testRpcCallEithAnEmptyArray() async throws {
         do {
-            _ = try await client.performBatch(requests: [])
+            _ = try await client.performBatch(request: [])
         } catch let error as JsonRpcError {
             XCTAssertEqual(error.code, -32600)
             XCTAssertEqual(error.message, "Invalid Request")
@@ -69,7 +69,7 @@ final class RpcCallTests: XCTestCase {
     }
 
     func testRpcCallBatch() async throws {
-        let responses = try await client.performBatch(requests: [
+        let responses = try await client.performBatch(request: [
             .invocation(method: "sum", params: [1,2,4], id: .number(1)),
             .notification(method: "notify_hello", params: [7]),
             .invocation(method: "subtract", params: [42,23], id: .number(2)),
@@ -95,7 +95,7 @@ final class RpcCallTests: XCTestCase {
     }
 
     func testRpcCallBatchAllNotifications() async throws {
-        let result = try await client.performBatch(requests: [
+        let result = try await client.performBatch(request: [
             .notification(method: "notify_sum", params: [1,2,4]),
             .notification(method: "notify_hello", params: [7]),
         ])
