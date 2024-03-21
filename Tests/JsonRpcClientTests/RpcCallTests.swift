@@ -76,7 +76,7 @@ final class RpcCallTests: XCTestCase {
             .invocation(method: "foo.get", params: ["name": "myself"], id: .number(5)),
             .invocation(method: "get_data", params: Parameters.void, id: .number(9)),
         ])
-        XCTAssertFalse(responses.isEmpty)
+        XCTAssertEqual(responses.count, 4)
 
         let sumResult = try responses.item(id: 1)?.result(Int.self)
         XCTAssertEqual(sumResult, 7)
