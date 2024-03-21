@@ -9,7 +9,7 @@ import Foundation
 
 
 extension KeyedDecodingContainer: ExpressibleByDictionaryLiteral {
-    public typealias Value = Any
+    public typealias Value = (any Decodable)
 
     public init(dictionaryLiteral elements: (Key, Value)...) {
         var storage: [String: Any] = [:]
