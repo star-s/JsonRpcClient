@@ -21,7 +21,7 @@ public extension JsonRpcClientImplementation {
         try await post(endpoint, parameters: JsonRpcRequest.notification(method: method, params: params))
     }
 
-    func performBatch(request: [JsonRpcRequest]) async throws -> [JsonRpcBatchResponseItem] {
+    func performBatch(request: [JsonRpcRequest]) async throws -> [JsonRpcResponse] {
         try await post(endpoint, parameters: request)
     }
 }

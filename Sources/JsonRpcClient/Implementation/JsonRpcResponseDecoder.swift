@@ -28,15 +28,19 @@ public struct JsonRpcResponseDecoder: ResponseDecoder {
     }
 
     public func decode<T: Decodable>(response: (data: Data, response: URLResponse)) async throws -> T {
-        guard T.self is [JsonRpcBatchResponseItem].Type else {
-            return try decoder.decode(JsonRpcResponse<T>.self, from: response.data).result.get()
+        if T.self is [JsonRpcResponse].Type {
+            if response.data.isEmpty {
+                return [] as! T
+            }
+            if let item = try? decoder.decode(JsonRpcResponse.self, from: response.data) {
+                throw try item.error()
+            }
+            return try decoder.decode(T.self, from: response.data)
         }
-        if response.data.isEmpty {
-            return [] as! T
+        let response = try decoder.decode(JsonRpcResponse.self, from: response.data)
+        guard response.isSuccess else {
+            throw try response.error()
         }
-        if let item = try? decoder.decode(JsonRpcBatchResponseItem.self, from: response.data) {
-            throw try item.error()
-        }
-        return try decoder.decode(T.self, from: response.data)
+        return try response.result(T.self)
     }
 }
