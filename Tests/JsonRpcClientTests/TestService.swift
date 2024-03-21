@@ -73,10 +73,11 @@ actor TestService: TransportLayer, JsonRpcService {
     }
 
     private func sum(request: JsonRpc.Request, response: JsonRpc.Response.Builder) async {
-        if let numbers = try? request.params([Int].self) {
+        do {
+            let numbers = try request.params([Int].self)
             let result = numbers.reduce(0, { $0 + $1 })
             response.return(result: result)
-        } else {
+        } catch {
             response.return(error: -32602, message: "Invalid params")
         }
     }
