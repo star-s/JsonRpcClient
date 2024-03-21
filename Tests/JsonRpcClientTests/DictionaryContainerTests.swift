@@ -8,7 +8,7 @@
 import XCTest
 @testable import JsonRpcClient
 
-final class SingleValueContainerTests: XCTestCase {
+final class DictionaryContainerTests: XCTestCase {
 
     func testDecodable() {
 
@@ -57,13 +57,13 @@ final class SingleValueContainerTests: XCTestCase {
     }
 }
 
-private extension SingleValueContainerTests {
+private extension DictionaryContainerTests {
     enum Keys: String, CodingKey {
         case testKey
     }
 
     func check<T: Decodable & Equatable>(_ value: T) {
-        let container = SingleValueContainer<Keys, T>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(T.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -73,7 +73,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkBool(_ value: Bool) {
-        let container = SingleValueContainer<Keys, Bool>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Bool.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -83,7 +83,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkString(_ value: String) {
-        let container = SingleValueContainer<Keys, String>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(String.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -93,7 +93,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkDouble(_ value: Double) {
-        let container = SingleValueContainer<Keys, Double>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Double.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -103,7 +103,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkFloat(_ value: Float) {
-        let container = SingleValueContainer<Keys, Float>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Float.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -113,7 +113,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkInt(_ value: Int) {
-        let container = SingleValueContainer<Keys, Int>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Int.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -123,7 +123,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkInt8(_ value: Int8) {
-        let container = SingleValueContainer<Keys, Int8>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Int8.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -133,7 +133,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkInt16(_ value: Int16) {
-        let container = SingleValueContainer<Keys, Int16>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Int16.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -143,7 +143,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkInt32(_ value: Int32) {
-        let container = SingleValueContainer<Keys, Int32>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Int32.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -153,7 +153,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkInt64(_ value: Int64) {
-        let container = SingleValueContainer<Keys, Int64>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(Int64.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -163,7 +163,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkUInt(_ value: UInt) {
-        let container = SingleValueContainer<Keys, UInt>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(UInt.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -173,7 +173,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkUInt8(_ value: UInt8) {
-        let container = SingleValueContainer<Keys, UInt8>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(UInt8.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -183,7 +183,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkUInt16(_ value: UInt16) {
-        let container = SingleValueContainer<Keys, UInt16>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(UInt16.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -193,7 +193,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkUInt32(_ value: UInt32) {
-        let container = SingleValueContainer<Keys, UInt32>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(UInt32.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)
@@ -203,7 +203,7 @@ private extension SingleValueContainerTests {
     }
 
     func checkUInt64(_ value: UInt64) {
-        let container = SingleValueContainer<Keys, UInt64>(key: .testKey, value: value)
+        let container = DictionaryContainer<Keys>(key: .testKey, value: value)
         do {
             let decodevValue = try container.decode(UInt64.self, forKey: .testKey)
             XCTAssertEqual(value, decodevValue)

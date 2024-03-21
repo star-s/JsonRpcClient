@@ -28,6 +28,21 @@ public struct JsonRpcBatchResponseItem: Decodable {
 
     private let container: KeyedDecodingContainer<DecodingKeys>
 
+    public init<T: Decodable>(_ result: Result<T, JsonRpcError>, id: JsonRpcId) {
+        self.jsonrpc = .v2_0
+        self.id = id
+        switch result {
+        case .success(let success):
+            self.container = [
+                .result: success
+            ]
+        case .failure(let failure):
+            self.container = [
+                .error: failure
+            ]
+        }
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DecodingKeys.self)
         guard container.contains(.result) != container.contains(.error) else {

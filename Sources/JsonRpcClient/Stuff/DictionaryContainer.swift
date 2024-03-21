@@ -7,28 +7,49 @@
 
 import Foundation
 
-struct SingleValueContainer<Key: CodingKey, Value: Decodable>: KeyedDecodingContainerProtocol {
-    private let key: Key
-    private let value: Value
+
+extension KeyedDecodingContainer: ExpressibleByDictionaryLiteral {
+    public typealias Value = Any
+
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        var storage: [String: Any] = [:]
+        var allKeys: [Key] = []
+
+        elements.forEach {
+            storage[$0.0.stringValue] = $0.1
+            allKeys.append($0.0)
+        }
+        self.init(DictionaryContainer(allKeys: allKeys, storage: storage))
+    }
+}
+
+struct DictionaryContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
+    let codingPath: [CodingKey] = []
+    let allKeys: [Key]
 
     private var context: DecodingError.Context {
         DecodingError.Context(codingPath: codingPath, debugDescription: "")
     }
 
-    init(key: Key, value: Value) {
-        self.key = key
-        self.value = value
+    private let storage: [String: Any]
+
+    init<Value: Decodable>(key: Key, value: Value) {
+        storage = [
+            key.stringValue : value
+        ]
+        allKeys = [key]
+    }
+
+    fileprivate init(allKeys: [Key], storage: [String : Any]) {
+        self.allKeys = allKeys
+        self.storage = storage
     }
 }
 
-extension SingleValueContainer {
-
-    var codingPath: [CodingKey] { [] }
-
-    var allKeys: [Key] { [key] }
+extension DictionaryContainer {
 
     func contains(_ key: Key) -> Bool {
-        self.key.stringValue == key.stringValue
+        storage.keys.contains(key.stringValue)
     }
 
     func decodeNil(forKey key: Key) throws -> Bool {
@@ -39,8 +60,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? Bool else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? Bool else {
+            throw DecodingError.typeMismatch(Bool.self, context)
         }
         return value
     }
@@ -49,8 +70,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let result = value as? (any StringProtocol) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let result = storage[key.stringValue] as? (any StringProtocol) else {
+            throw DecodingError.typeMismatch(String.self, context)
         }
         return String(result)
     }
@@ -59,8 +80,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryFloatingPoint) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryFloatingPoint) else {
+            throw DecodingError.typeMismatch(Double.self, context)
         }
         return Double(value)
     }
@@ -69,8 +90,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryFloatingPoint) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryFloatingPoint) else {
+            throw DecodingError.typeMismatch(Float.self, context)
         }
         return Float(value)
     }
@@ -79,8 +100,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryInteger) else {
+            throw DecodingError.typeMismatch(Int.self, context)
         }
         return Int(value)
     }
@@ -89,8 +110,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryInteger) else {
+            throw DecodingError.typeMismatch(Int8.self, context)
         }
         return Int8(value)
     }
@@ -99,8 +120,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryInteger) else {
+            throw DecodingError.typeMismatch(Int16.self, context)
         }
         return Int16(value)
     }
@@ -109,8 +130,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryInteger) else {
+            throw DecodingError.typeMismatch(Int32.self, context)
         }
         return Int32(value)
     }
@@ -119,8 +140,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any BinaryInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any BinaryInteger) else {
+            throw DecodingError.typeMismatch(Int64.self, context)
         }
         return Int64(value)
     }
@@ -129,8 +150,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any UnsignedInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any UnsignedInteger) else {
+            throw DecodingError.typeMismatch(UInt.self, context)
         }
         return UInt(value)
     }
@@ -139,8 +160,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any UnsignedInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any UnsignedInteger) else {
+            throw DecodingError.typeMismatch(UInt8.self, context)
         }
         return UInt8(value)
     }
@@ -149,8 +170,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any UnsignedInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any UnsignedInteger) else {
+            throw DecodingError.typeMismatch(UInt16.self, context)
         }
         return UInt16(value)
     }
@@ -159,8 +180,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any UnsignedInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any UnsignedInteger) else {
+            throw DecodingError.typeMismatch(UInt32.self, context)
         }
         return UInt32(value)
     }
@@ -169,8 +190,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let value = value as? (any UnsignedInteger) else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let value = storage[key.stringValue] as? (any UnsignedInteger) else {
+            throw DecodingError.typeMismatch(UInt64.self, context)
         }
         return UInt64(value)
     }
@@ -179,8 +200,8 @@ extension SingleValueContainer {
         guard contains(key) else {
             throw DecodingError.keyNotFound(key, context)
         }
-        guard let result = value as? T else {
-            throw DecodingError.typeMismatch(Value.self, context)
+        guard let result = storage[key.stringValue] as? T else {
+            throw DecodingError.typeMismatch(T.self, context)
         }
         return result
     }

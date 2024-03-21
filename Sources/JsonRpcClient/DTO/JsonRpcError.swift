@@ -20,16 +20,18 @@ public struct JsonRpcError {
     public init(code: Int, message: String) {
         self.code = code
         self.message = message
-        self.container = KeyedDecodingContainer(EmptyKeyedContainer())
+        self.container = [:]
     }
 
     public init<T: Decodable>(code: Int, message: String, data: T?) {
         self.code = code
         self.message = message
         if let data {
-            self.container = KeyedDecodingContainer(SingleValueContainer(key: .data, value: data))
+            self.container = [
+                .data: data
+            ]
         } else {
-            self.container = KeyedDecodingContainer(EmptyKeyedContainer())
+            self.container = [:]
         }
     }
 
